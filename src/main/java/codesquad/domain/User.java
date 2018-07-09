@@ -1,6 +1,14 @@
 package codesquad.domain;
 
+import javax.persistence.*;
+
+@Entity
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(length = 30, unique = true, nullable = false) // Not Null, unique, 등등을 설정
     private String userId;
     private String password;
     private String name;
