@@ -1,7 +1,14 @@
 package codesquad.domain;
 
+import javax.persistence.*;
+
+@Entity
 public class Question {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String writer;
+    @Column(length = 40)
     private String title;
     private String content;
 
@@ -12,6 +19,14 @@ public class Question {
         this.writer = writer;
         this.title = title;
         this.content = content;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getWriter() {

@@ -7,7 +7,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(length = 30, unique = true, nullable = false) // Not Null, unique, 등등을 설정
     private String userId;
     private String password;
@@ -54,5 +53,13 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

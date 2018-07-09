@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-//@RequestMapping("/users")
+@RequestMapping("/users")
 public class UserController {
-    private List<User> users = new ArrayList<>();
 
     @Autowired
     private UserRepository userRepository;
@@ -32,21 +31,36 @@ public class UserController {
 //        return "/user/list";
 //    }
 
-    @GetMapping("/users/{index}")
-    public String show(@PathVariable long id, Model model) {
+    @GetMapping("/{id}")
+    public String show(@PathVariable Long id, Model model) {
         model.addAttribute("user", userRepository.findById(id).get());
         return "/user/profile";
     }
 
-    @PostMapping("/users")
+    @PostMapping("")
     public String create(User user) {
         userRepository.save(user);
         return "redirect:/users";
     }
 
-    @GetMapping("/users")
+    @GetMapping("")
     public String list(Model model) {
-        model.addAttribute("users", users);
+        model.addAttribute("users", userRepository.findAll());
         return "/user/list";
+    }
+
+    @GetMapping("/{id}/form")
+    public String updateForm(@PathVariable Long id, Model model) {
+        model.addAttribute("user", userRepository.findById(id).get());
+        return "/user/updateForm";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(User user) {
+        if (!userRepository.findById(user.getId()).get().getPassword().equals(user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+        }
+        userRepository.save(user);
+        return "redirect:/users";
     }
 }

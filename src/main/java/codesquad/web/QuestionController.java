@@ -1,38 +1,53 @@
 package codesquad.web;
 
 import codesquad.domain.Question;
-import codesquad.domain.UserRepository;
+import codesquad.domain.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/qnas")
 public class QuestionController {
 
-    private List<Question> questionList = new ArrayList<>();
+    @Autowired
+    private QuestionRepository questionRepository;
 
     @GetMapping("")
     public String index(Model model) {
-        model.addAttribute("qnas", questionList);
-        return "/qna/index";
+        model.addAttribute("qnas", questionRepository.findAll());
+        return "index";
     }
 
-    @PostMapping("/qnas")
+    @PostMapping("")
     public String create(Question question) {
-        questionList.add(question);
+        questionRepository.save(question);
         return "redirect:/";
     }
 
-    @GetMapping("/qnas/{index}")
-    public String show(@PathVariable int index, Model model) {
-        model.addAttribute("qna", questionList.get(index));
+    @GetMapping("/{id}")
+    public String show(@PathVariable Long id, Model model) {
+        model.addAttribute("qna", questionRepository.findById(id).get());
         return "/qna/show";
+    }
+
+    @GetMapping("/{id}/form")
+    public String updateForm(@PathVariable("id") Question question, Model model) {
+        model.addAttribute("qna", question);
+        return "/qna/updateForm";
+    }
+
+    @PutMapping("/{id}")
+    public String update(Question question) {
+        questionRepository.save(question);
+        return "redirect:/qnas";
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        questionRepository.deleteById(id);
+        return "redirect:/qnas";
     }
 
 }
