@@ -7,8 +7,10 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 100)
     private String writer;
-    @Column(length = 40)
+    @Column(nullable = false, length = 40)
     private String title;
     private String content;
 
@@ -51,5 +53,11 @@ public class Question {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Question updateQuestion(Question question) {
+        this.title = question.title;
+        this.content = question.content;
+        return this;
     }
 }

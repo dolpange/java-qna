@@ -39,8 +39,9 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-    public String update(Question question) {
-        questionRepository.save(question);
+    public String update(@PathVariable Long id, Question question) {
+        Question updatedQuestion = questionRepository.findById(id).get().updateQuestion(question);
+        questionRepository.save(updatedQuestion);
         return "redirect:/qnas";
     }
 

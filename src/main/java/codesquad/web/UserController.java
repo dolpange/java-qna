@@ -20,17 +20,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-//    @PostMapping("/users")
-//    public String create(String userId,
-//                         String password,
-//                         String name,
-//                         String email, Model model) {
-//
-//        users.add(new User(userId, password, name, email));
-//        model.addAttribute("users", users);
-//        return "/user/list";
-//    }
-
     @GetMapping("/{id}")
     public String show(@PathVariable Long id, Model model) {
         model.addAttribute("user", userRepository.findById(id).get());
@@ -56,11 +45,12 @@ public class UserController {
     }
 
     @PostMapping("/{id}/update")
-    public String update(User user) {
-        if (!userRepository.findById(user.getId()).get().getPassword().equals(user.getPassword())) {
+    public String update(@PathVariable Long id, User user) {
+        User dbUser =  userRepository.findById(id).get();
+        if (!dbUser.checkValidity(user)) {
             throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
         }
-        userRepository.save(user);
+        userRepository.save(dbUser.updateUser(user));
         return "redirect:/users";
     }
 }
