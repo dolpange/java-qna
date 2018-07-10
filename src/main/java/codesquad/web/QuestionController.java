@@ -2,7 +2,7 @@ package codesquad.web;
 
 import codesquad.domain.Question;
 import codesquad.domain.QuestionRepository;
-import codesquad.domain.User;
+import codesquad.exception.InvalidLoginException;
 import codesquad.util.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +26,8 @@ public class QuestionController {
 
     @PostMapping
     public String create(Question question, HttpSession session) {
-        if (!SessionUtil.checkLogin(session)) {
-            return "/user/login";
-        }
-        question.setWriter(SessionUtil.getUser(session));
+        question.setWriter(SessionUtil.getUser(session)
+                .orElseThrow(() -> new InvalidLoginException("로그인이 필요합니다")));
         questionRepository.save(question);
         return "redirect:/";
     }
@@ -42,21 +40,16 @@ public class QuestionController {
 
     @GetMapping("/form")
     public String showForm(Model model, HttpSession session) {
-        if (!SessionUtil.checkLogin(session)) {
-            return "/user/login";
-        }
-        model.addAttribute("user", SessionUtil.getUser(session));
+        model.addAttribute("user", SessionUtil.getUser(session)
+                .orElseThrow(() -> new InvalidLoginException("로그인이 필요합니다")));
         return "/qna/form";
     }
 
     @GetMapping("/{id}/form")
     public String updateForm(@PathVariable("id") Question question, Model model, HttpSession session) {
-        if (!SessionUtil.checkLogin(session)) {
-            return "/user/login";
-        }
-
-        if (!question.matchWriter(SessionUtil.getUserId(session))) {
-            return "/qna/update_failed";
+        if (!question.matchWriter(SessionUtil.getUser(session)
+                .orElseThrow(() -> new InvalidLoginException("로그인이 필요합니다")).getUserId())) {
+            throw new InvalidLoginException("다른 사용자의 글을 수정할 수는 없습니다.");
         }
 
         model.addAttribute("qna", question);
@@ -72,13 +65,12 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
-        if (!SessionUtil.checkLogin(session)) {
-            return "/user/login";
-        }
+        SessionUtil.getUser(session)
+                .orElseThrow(() -> new InvalidLoginException("로그인이 필요합니다")).getUserId();
 
         Question question = questionRepository.findById(id).get();
         if (!question.matchWriter(SessionUtil.getUserId(session))) {
-            return "/user/login";
+            throw new InvalidLoginException("다른 사용자의 글을 삭제할 수는 없습니다.");
         }
 
         questionRepository.deleteById(id);

@@ -2,6 +2,7 @@ package codesquad.web;
 
 import codesquad.domain.User;
 import codesquad.domain.UserRepository;
+import codesquad.exception.InvalidLoginException;
 import codesquad.util.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,14 +21,10 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession session) {
-        Optional<User> maybeUser = userRepository.findByUserId(userId);
-        if (!maybeUser.isPresent()) {
-            return "/user/login_failed";
-        }
+        User user = userRepository.findByUserId(userId).orElseThrow(() -> new InvalidLoginException("회원가입이 안된 아이디입니다."));
 
-        User user = maybeUser.get();
-        if (! user.matchPassword(password)) {
-            return "/user/login_failed";
+        if (!user.matchPassword(password)) {
+            throw new InvalidLoginException("패스워드가 다릅니다.");
         }
 
         SessionUtil.setUser(session, user);
@@ -60,12 +57,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, User user, HttpSession session) {
-        if (!SessionUtil.checkLogin(session)) {
-            return "/user/login";
-        }
-
         if(!SessionUtil.checkLoginUser(session, user)) {
-            return "/user/update_failed";
+            throw new InvalidLoginException("다른 사용자의 정보는 수정할 수 없습니다.");
         }
 
         User dbUser =  userRepository.findById(id).get();
