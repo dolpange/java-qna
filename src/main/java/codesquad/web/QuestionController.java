@@ -51,7 +51,6 @@ public class QuestionController {
                 .orElseThrow(() -> new InvalidLoginException("로그인이 필요합니다")).getUserId())) {
             throw new InvalidLoginException("다른 사용자의 글을 수정할 수는 없습니다.");
         }
-
         model.addAttribute("qna", question);
         return "/qna/updateForm";
     }
@@ -72,7 +71,6 @@ public class QuestionController {
         if (!question.matchWriter(SessionUtil.getUserId(session))) {
             throw new InvalidLoginException("다른 사용자의 글을 삭제할 수는 없습니다.");
         }
-
         questionRepository.deleteById(id);
         return "redirect:/qnas";
     }

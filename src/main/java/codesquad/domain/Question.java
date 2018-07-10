@@ -14,7 +14,6 @@ public class Question {
 
     @Column(nullable = false, length = 40)
     private String title;
-
     private String content;
 
     public Question() {

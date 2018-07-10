@@ -86,5 +86,4 @@ public class User {
     public boolean matchName(String name) {
         return this.name.equals(name);
     }
-
 }
